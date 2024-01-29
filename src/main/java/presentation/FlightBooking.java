@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
@@ -207,8 +208,9 @@ public class FlightBooking extends JFrame {
 				java.util.Date date =newDate(Integer.parseInt(year.getText()),months.getSelectedIndex(),Integer.parseInt(day.getText()));
 				 
 				concreteFlightCollection=businessLogic.getConcreteFlights(departCity.getText(),arrivalCity.getText(),date);
-				for (ConcreteFlight f : concreteFlightCollection) 
-					flightInfo.addElement(f); 
+				Iterator<ConcreteFlight> flights=concreteFlightCollection.iterator();
+				while (flights.hasNext()) 
+					flightInfo.addElement(flights.next()); 
 				if (concreteFlightCollection.isEmpty()) searchResult.setText("No flights in that city in that date");
 				else searchResult.setText("Choose an available flight in this list:");
 			}
@@ -246,14 +248,14 @@ public class FlightBooking extends JFrame {
 				int num=0;
 				boolean error=false;
 				if (bussinesTicket.isSelected()) { 
-					num=selectedConcreteFlight.getBussinesNumber();
+				    num=selectedConcreteFlight.getBussinesNumber();
 					if (num>0) selectedConcreteFlight.setBusinessNumber(num-1); else error=true; 
 				}
-				else if (firstTicket.isSelected()) {
+				if (firstTicket.isSelected()) {
 					num=selectedConcreteFlight.getFirstNumber();
 					if (num>0) selectedConcreteFlight.setFirstNumber(num-1); else error=true;
 				}
-				else if (touristTicket.isSelected()) {
+				if (touristTicket.isSelected()) {
 					num=selectedConcreteFlight.getTouristNumber();
 					if (num>0) selectedConcreteFlight.setTouristNumber(num-1); else error=true;
 				}
