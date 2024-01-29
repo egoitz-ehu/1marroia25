@@ -8,7 +8,7 @@ public class ConcreteFlight {
 	
 String concreteFlightCode;
 Date date;
-int businessNumber;
+int bussinesNumber;
 int touristNumber;
 int firstNumber;
 String time;
@@ -18,7 +18,7 @@ public ConcreteFlight(String concreteFlightCode, Date date, int businessNumber,i
 	super();
 	this.concreteFlightCode=concreteFlightCode;
 	this.date = date;
-	this.businessNumber = businessNumber;
+	this.bussinesNumber = businessNumber;
 	this.firstNumber = firstNumber;
 	this.touristNumber = touristNumber;
 	this.flight = flight;
@@ -41,11 +41,11 @@ public Date getDate() {
 public void setDate(Date date) {
 	this.date = date;
 }
-public int getBusinessNumber() {
-	return businessNumber;
+public int getBussinesNumber() {
+	return bussinesNumber;
 }
 public void setBusinessNumber(int businessNumber) {
-	this.businessNumber = businessNumber;
+	this.bussinesNumber = businessNumber;
 }
 public int getTouristNumber() {
 	return touristNumber;
@@ -68,7 +68,7 @@ public String toString() {
 	int month = calendar.get(Calendar.MONTH) + 1;
 	int day = calendar.get(Calendar.DAY_OF_MONTH);
 	
-	return flight.toString()+"/"+(year)+"-"+(month)+"-"+day+"/"+time+"-->"+businessNumber+"/"+firstNumber+"/"+touristNumber;}
+	return flight.toString()+"-"+(year)+"/"+(month)+"/"+day+"/"+time+"-->"+bussinesNumber+"/"+firstNumber+"/"+touristNumber;}
 
 public Flight getFlight() {
 	return flight;

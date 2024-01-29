@@ -246,7 +246,7 @@ public class FlightBooking extends JFrame {
 				int num=0;
 				boolean error=false;
 				if (bussinesTicket.isSelected()) { 
-					num=selectedConcreteFlight.getBusinessNumber();
+					num=selectedConcreteFlight.getBussinesNumber();
 					if (num>0) selectedConcreteFlight.setBusinessNumber(num-1); else error=true; 
 				}
 				else if (firstTicket.isSelected()) {
