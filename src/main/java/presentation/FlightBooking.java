@@ -183,7 +183,6 @@ public class FlightBooking extends JFrame {
 		
 		
 		bussinesTicket = new JRadioButton("Business");
-		bussinesTicket.setSelected(true);
 		fareButtonGroup.add(bussinesTicket);
 		bussinesTicket.setBounds(99, 238, 101, 23);
 		contentPane.add(bussinesTicket);
@@ -201,7 +200,7 @@ public class FlightBooking extends JFrame {
 		lookforFlights = new JButton("Look for Concrete Flights");
 		lookforFlights.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				bookFlight.setEnabled(true);
+				//bookFlight.setEnabled(true);
 				flightInfo.clear();
 				bookFlight.setText("");
 				
@@ -213,6 +212,12 @@ public class FlightBooking extends JFrame {
 					flightInfo.addElement(flights.next()); 
 				if (concreteFlightCollection.isEmpty()) searchResult.setText("No flights in that city in that date");
 				else searchResult.setText("Choose an available flight in this list:");
+				
+				fareButtonGroup.clearSelection();
+				bussinesTicket.setEnabled(false);
+				firstTicket.setEnabled(false);
+				touristTicket.setEnabled(false);
+				bookFlight.setEnabled(false);
 			}
 		});
 		lookforFlights.setBounds(81, 90, 261, 40);
@@ -231,8 +236,16 @@ public class FlightBooking extends JFrame {
 				if (!flightList.isSelectionEmpty()){  
 													 
 					selectedConcreteFlight = (ConcreteFlight) flightList.getSelectedValue();
-					bookFlight.setEnabled(true);
-					bookFlight.setText("Book: "+selectedConcreteFlight);  // TODO Auto-generated Event stub valueChanged()
+					
+					fareButtonGroup.clearSelection();
+					bussinesTicket.setEnabled(selectedConcreteFlight.getBussinesNumber()>0);
+					firstTicket.setEnabled(selectedConcreteFlight.getFirstNumber()>0);
+					touristTicket.setEnabled(selectedConcreteFlight.getTouristNumber()>0);
+					
+					//bookFlight.setEnabled(true);
+					//bookFlight.setText("Book: "+selectedConcreteFlight);  // TODO Auto-generated Event stub valueChanged()
+					bookFlight.setText("");
+					bookFlight.setEnabled(false);
 				}
 			}
 		});
@@ -264,6 +277,19 @@ public class FlightBooking extends JFrame {
 				bookFlight.setEnabled(false);
 			}
 		});
+		
+		ActionListener radioButtonListner = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				bookFlight.setEnabled(true);
+				bookFlight.setText("Book: "+selectedConcreteFlight);
+			}
+		};
+		
+		bussinesTicket.addActionListener(radioButtonListner);
+		firstTicket.addActionListener(radioButtonListner);
+		touristTicket.addActionListener(radioButtonListner);
+		
+		
 		bookFlight.setBounds(31, 273, 399, 40);
 		contentPane.add(bookFlight);
 
