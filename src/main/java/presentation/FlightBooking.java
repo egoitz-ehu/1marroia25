@@ -29,6 +29,8 @@ import javax.swing.JList;
 import javax.swing.border.EmptyBorder;
 
 import domain.ConcreteFlight;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.PopupMenuEvent;
 
 public class FlightBooking extends JFrame {
 	
@@ -43,9 +45,6 @@ public class FlightBooking extends JFrame {
 	private JLabel lblDay = new JLabel("Day:");;
 	private JLabel jLabelResult = new JLabel();
 	private JLabel searchResult =   new JLabel();
-	
-	private JTextField arrivalCity;
-	private JTextField departCity;
 	private JTextField day = null;
 	private JComboBox<String> months = null;
 	private DefaultComboBoxModel<String> monthNames = new DefaultComboBoxModel<String>();
@@ -75,6 +74,13 @@ public class FlightBooking extends JFrame {
 	
 	
 	private ConcreteFlight selectedConcreteFlight;
+	
+	
+	private JComboBox<String> comboBoxDeparting = null;
+	private DefaultComboBoxModel<String> departingCitiesModel = new DefaultComboBoxModel<String>();
+	
+	private JComboBox<String> comboBoxArrival = null;
+	private DefaultComboBoxModel<String> arrivalCitiesModel = new DefaultComboBoxModel<String>();
 	
 	
 
@@ -126,18 +132,6 @@ public class FlightBooking extends JFrame {
 		lblDepartCity.setBounds(21, 11, 103, 16);
 		contentPane.add(lblDepartCity);
 		
-		arrivalCity = new JTextField();
-		arrivalCity.setText("Bilbo");
-		arrivalCity.setBounds(99, 34, 243, 26);
-		contentPane.add(arrivalCity);
-		arrivalCity.setColumns(10);
-		
-		departCity = new JTextField();
-		departCity.setText("Donostia");
-		departCity.setBounds(99, 6, 243, 26);
-		contentPane.add(departCity);
-		departCity.setColumns(10);
-		
 		
 		lblYear = new JLabel("Year:");
 		lblYear.setBounds(21, 62, 33, 16);
@@ -181,7 +175,6 @@ public class FlightBooking extends JFrame {
 		contentPane.add(lblRoomType);
 		
 		
-		
 		bussinesTicket = new JRadioButton("Business");
 		fareButtonGroup.add(bussinesTicket);
 		bussinesTicket.setBounds(99, 238, 101, 23);
@@ -197,6 +190,33 @@ public class FlightBooking extends JFrame {
 		touristTicket.setBounds(278, 238, 77, 23);
 		contentPane.add(touristTicket);
 		
+		comboBoxDeparting = new JComboBox<String>();
+		comboBoxDeparting.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				arrivalCitiesModel.removeAllElements();
+				arrivalCitiesModel.addAll(businessLogic.getArrivalCitiesFrom(departingCitiesModel.getSelectedItem().toString()));
+			}
+		});
+		comboBoxDeparting.addPopupMenuListener(new PopupMenuListener() {
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				if(departingCitiesModel.getSize()==0)
+					departingCitiesModel.addAll(businessLogic.getAllDepartingCities());
+			}
+		});
+		comboBoxDeparting.setBounds(99, 8, 243, 22);
+		contentPane.add(comboBoxDeparting);
+		comboBoxDeparting.setModel(departingCitiesModel);
+		
+		comboBoxArrival = new JComboBox<String>();
+		comboBoxArrival.setBounds(99, 29, 243, 22);
+		contentPane.add(comboBoxArrival);
+		comboBoxArrival.setModel(arrivalCitiesModel);
+		
+		
 		lookforFlights = new JButton("Look for Concrete Flights");
 		lookforFlights.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -206,7 +226,7 @@ public class FlightBooking extends JFrame {
 				
 				java.util.Date date =newDate(Integer.parseInt(year.getText()),months.getSelectedIndex(),Integer.parseInt(day.getText()));
 				 
-				concreteFlightCollection=businessLogic.getConcreteFlights(departCity.getText(),arrivalCity.getText(),date);
+				concreteFlightCollection=businessLogic.getConcreteFlights(departingCitiesModel.getSelectedItem().toString(),arrivalCitiesModel.getSelectedItem().toString(),date);
 				Iterator<ConcreteFlight> flights=concreteFlightCollection.iterator();
 				while (flights.hasNext()) 
 					flightInfo.addElement(flights.next()); 
