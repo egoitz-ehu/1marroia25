@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -176,22 +177,28 @@ public class FlightBooking extends JFrame {
 		fareButtonGroup.add(bussinesTicket);
 		bussinesTicket.setBounds(99, 238, 101, 23);
 		contentPane.add(bussinesTicket);
+		bussinesTicket.setEnabled(false);
 		
 		firstTicket = new JRadioButton("First");
 		fareButtonGroup.add(firstTicket);
 		firstTicket.setBounds(202, 238, 77, 23);
 		contentPane.add(firstTicket);
+		firstTicket.setEnabled(false);
 		
 		touristTicket = new JRadioButton("Tourist");
 		fareButtonGroup.add(touristTicket);
 		touristTicket.setBounds(278, 238, 77, 23);
 		contentPane.add(touristTicket);
+		touristTicket.setEnabled(false);
 		
 		comboBoxDeparting = new JComboBox<String>();
 		comboBoxDeparting.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				arrivalCitiesModel.removeAllElements();
 				arrivalCitiesModel.addAll(businessLogic.getArrivalCitiesFrom(departingCitiesModel.getSelectedItem().toString()));
+				if(arrivalCitiesModel.getSize()>0) {
+					comboBoxArrival.setSelectedIndex(0);
+				}
 			}
 		});
 		comboBoxDeparting.addPopupMenuListener(new PopupMenuListener() {
@@ -213,6 +220,23 @@ public class FlightBooking extends JFrame {
 		contentPane.add(comboBoxArrival);
 		comboBoxArrival.setModel(arrivalCitiesModel);
 		
+		comboBoxFlights = new JComboBox<ConcreteFlight>();
+		comboBoxFlights.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(flightInfoModel.getSelectedItem()!=null) {
+					selectedConcreteFlight = (ConcreteFlight) flightInfoModel.getSelectedItem();
+					fareButtonGroup.clearSelection();
+					bussinesTicket.setEnabled(selectedConcreteFlight.getBussinesNumber()>0);
+					firstTicket.setEnabled(selectedConcreteFlight.getFirstNumber()>0);
+					touristTicket.setEnabled(selectedConcreteFlight.getTouristNumber()>0);
+					bookFlight.setText("");
+					bookFlight.setEnabled(false);
+				}
+			}
+		});
+		comboBoxFlights.setBounds(57, 174, 324, 22);
+		contentPane.add(comboBoxFlights);
+		comboBoxFlights.setModel(flightInfoModel);
 		
 		lookforFlights = new JButton("Look for Concrete Flights");
 		lookforFlights.addActionListener(new ActionListener() {
@@ -222,20 +246,34 @@ public class FlightBooking extends JFrame {
 				flightInfoModel.removeAllElements();
 				bookFlight.setText("");
 				
-				java.util.Date date =newDate(Integer.parseInt(year.getText()),months.getSelectedIndex(),Integer.parseInt(day.getText()));
-				 
-				concreteFlightCollection=businessLogic.getConcreteFlights(departingCitiesModel.getSelectedItem().toString(),arrivalCitiesModel.getSelectedItem().toString(),date);
-				Iterator<ConcreteFlight> flights=concreteFlightCollection.iterator();
-				while (flights.hasNext()) 
-					flightInfoModel.addElement(flights.next()); 
-				if (concreteFlightCollection.isEmpty()) searchResult.setText("No flights in that city in that date");
-				else searchResult.setText("Choose an available flight in this list:");
-				
 				fareButtonGroup.clearSelection();
 				bussinesTicket.setEnabled(false);
 				firstTicket.setEnabled(false);
 				touristTicket.setEnabled(false);
 				bookFlight.setEnabled(false);
+				
+				try {
+					java.util.Date date =newDate(Integer.parseInt(year.getText()),months.getSelectedIndex(),Integer.parseInt(day.getText()));
+					 
+					concreteFlightCollection=businessLogic.getConcreteFlights(departingCitiesModel.getSelectedItem().toString(),arrivalCitiesModel.getSelectedItem().toString(),date);
+					Iterator<ConcreteFlight> flights=concreteFlightCollection.iterator();
+					while (flights.hasNext()) 
+						flightInfoModel.addElement(flights.next()); 
+					if (concreteFlightCollection.isEmpty()) searchResult.setText("No flights in that city in that date");
+					else {
+						searchResult.setText("Choose an available flight in this list:");
+						comboBoxFlights.setSelectedIndex(0);
+					}
+					searchResult.setForeground(Color.BLACK);
+				} catch (NumberFormatException e1) {
+					searchResult.setText("The day and year must be whole numbers");
+					searchResult.setForeground(Color.RED);
+					System.out.println("The day and year must be whole numbers");
+				} catch (NullPointerException e2) {
+					searchResult.setText("It is necessary to select a departing and arrival city");
+					searchResult.setForeground(Color.RED);
+					System.out.println("It is necessary to select a departing and arrival city");
+				}
 			}
 		});
 		lookforFlights.setBounds(81, 90, 261, 40);
@@ -247,6 +285,7 @@ public class FlightBooking extends JFrame {
 		
 		
 		bookFlight = new JButton("");
+		bookFlight.setEnabled(false);
 		bookFlight.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int num=0;
@@ -266,6 +305,11 @@ public class FlightBooking extends JFrame {
 				if (error) bookFlight.setText("Error: There were no seats available!");
 				else bookFlight.setText("Booked. #seat left: "+(num-1));
 				bookFlight.setEnabled(false);
+				fareButtonGroup.clearSelection();
+				bussinesTicket.setEnabled(false);
+				firstTicket.setEnabled(false);
+				touristTicket.setEnabled(false);
+				flightInfoModel.removeAllElements();
 			}
 		});
 		
@@ -295,24 +339,5 @@ public class FlightBooking extends JFrame {
 		
 		searchResult.setBounds(57, 130, 314, 16);
 		contentPane.add(searchResult);
-		
-		JComboBox<ConcreteFlight> comboBoxFlights = new JComboBox<ConcreteFlight>();
-		comboBoxFlights.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(flightInfoModel.getSelectedItem()!=null) {
-					selectedConcreteFlight = (ConcreteFlight) flightInfoModel.getSelectedItem();
-					fareButtonGroup.clearSelection();
-					bussinesTicket.setEnabled(selectedConcreteFlight.getBussinesNumber()>0);
-					firstTicket.setEnabled(selectedConcreteFlight.getFirstNumber()>0);
-					touristTicket.setEnabled(selectedConcreteFlight.getTouristNumber()>0);
-					bookFlight.setText("");
-					bookFlight.setEnabled(false);
-				}
-			}
-		});
-		comboBoxFlights.setBounds(57, 174, 324, 22);
-		contentPane.add(comboBoxFlights);
-		comboBoxFlights.setModel(flightInfoModel);
-		
 	}
 }  //  @jve:decl-index=0:visual-constraint="18,9"
