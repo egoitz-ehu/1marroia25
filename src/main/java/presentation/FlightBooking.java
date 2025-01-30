@@ -253,6 +253,27 @@ public class FlightBooking extends JFrame {
 				bookFlight.setEnabled(false);
 				
 				try {
+					int dayMaxNumber;
+					switch(months.getSelectedIndex()) {
+						case 0: case 2: case 4: case 6: case 7: case 9: case 11: 
+							dayMaxNumber=31;
+							break;
+						case 1:
+							if(Integer.parseInt(year.getText()) % 4 == 0 && ((Integer.parseInt(year.getText()) % 100 != 0) || (Integer.parseInt(year.getText()) % 400 == 0)))
+								dayMaxNumber=29;
+							else
+								dayMaxNumber=28;
+							break;
+						case 3: case 5: case 8: case 10:
+							dayMaxNumber=30;
+							break;
+						default:
+							dayMaxNumber=0;
+								
+					}
+					if(Integer.parseInt(day.getText())<1 || Integer.parseInt(day.getText())>dayMaxNumber || Integer.parseInt(year.getText())<0)
+							throw new IllegalArgumentException("The year or the day is invalid.");
+					
 					java.util.Date date =newDate(Integer.parseInt(year.getText()),months.getSelectedIndex(),Integer.parseInt(day.getText()));
 					 
 					concreteFlightCollection=businessLogic.getConcreteFlights(departingCitiesModel.getSelectedItem().toString(),arrivalCitiesModel.getSelectedItem().toString(),date);
@@ -273,6 +294,10 @@ public class FlightBooking extends JFrame {
 					searchResult.setText("It is necessary to select a departing and arrival city");
 					searchResult.setForeground(Color.RED);
 					System.out.println("It is necessary to select a departing and arrival city");
+				} catch (IllegalArgumentException e3) {
+					searchResult.setText(e3.getMessage());
+					searchResult.setForeground(Color.RED);
+					System.out.println(e3.getMessage());
 				}
 			}
 		});
